@@ -1,5 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <body>
-      <h1>hola xdxdxd</h1>
-    </body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instalar Linux en Android con Termux y Andronix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #50b3a2;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #e8491d 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        header #branding {
+            float: left;
+        }
+        header #branding h1 {
+            margin: 0;
+        }
+        header nav {
+            float: right;
+            margin-top: 10px;
+        }
+        .instructions {
+            padding: 20px;
+            background: #fff;
+            margin: 20px 0;
+        }
+        footer {
+            background: #50b3a2;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+    </style>
 </head>
+<body>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1>Instalar Linux en Android</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#requirements">Requisitos</a></li>
+                    <li><a href="#steps">Pasos</a></li>
+                    <li><a href="#notes">Notas</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="requirements" class="instructions">
+            <h2>Requisitos</h2>
+            <ul>
+                <li>Un dispositivo Android</li>
+                <li>Conexión a Internet</li>
+                <li>La aplicación Termux (disponible en Google Play Store o F-Droid)</li>
+                <li>La aplicación Andronix (disponible en Google Play Store)</li>
+            </ul>
+        </section>
+
+        <section id="steps" class="instructions">
+            <h2>Pasos para la instalación</h2>
+            <ol>
+                <li><strong>Instalar Termux:</strong> Descarga e instala Termux desde la Google Play Store o F-Droid.</li>
+                <li><strong>Actualizar paquetes:</strong> Abre Termux y ejecuta los siguientes comandos para actualizar los paquetes:
+                    <pre><code>pkg update && pkg upgrade</code></pre>
+                </li>
+                <li><strong>Instalar Andronix:</strong> Descarga e instala Andronix desde la Google Play Store.</li>
+                <li><strong>Configurar Andronix:</strong> Abre Andronix y selecciona la distribución de Linux que deseas instalar (por ejemplo, Ubuntu, Debian, etc.). Sigue las instrucciones en la aplicación para instalar la distribución seleccionada.</li>
+                <li><strong>Finalizar la instalación en Termux:</strong> Andronix proporcionará un script que debe ser ejecutado en Termux. Copia el script proporcionado y pégalo en Termux para completar la instalación.</li>
+            </ol>
+        </section>
+
+        <section id="notes" class="instructions">
+            <h2>Notas</h2>
+            <p>Asegúrate de tener suficiente espacio de almacenamiento en tu dispositivo para la instalación de la distribución Linux. Algunas distribuciones pueden requerir varios gigabytes de espacio.</p>
+            <p>El rendimiento puede variar según las especificaciones de tu dispositivo Android. Dispositivos más potentes ofrecerán una mejor experiencia de usuario.</p>
+        </section>
+    </div>
+
+    <footer>
+        <p>Guía creada por ChatGPT</p>
+    </footer>
+</body>
+</html>
