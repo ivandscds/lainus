@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botón con sonido</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            font-size: 20px;
+            padding: 15px 30px;
+            background-color: #ff5733;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="playSound()">Adriana salte!!1!</button>
+    <audio id="sound" src="adrianasalte.mp3"></audio>
+    <script>
+        function playSound() {
+            document.getElementById('sound').play();
+        }
+    </script>
+</body>
+</html>
