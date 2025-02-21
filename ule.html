@@ -11,6 +11,11 @@
             color: #fff;
             margin: 0;
             padding: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+        .light-mode {
+            background-color: #fff;
+            color: #000;
         }
         header {
             background-color: #333;
@@ -18,7 +23,7 @@
             font-size: 24px;
             font-weight: bold;
         }
-        input {
+        input, select {
             margin: 10px;
             padding: 10px;
             width: 80%;
@@ -52,6 +57,8 @@
             margin: 10px;
             border-radius: 10px;
             transition: transform 0.3s;
+            cursor: pointer;
+            object-fit: cover;
         }
         .gallery img:hover {
             transform: scale(1.1);
@@ -64,18 +71,61 @@
                 width: 140px;
             }
         }
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .fullscreen img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <header>Galería Rule34</header>
+    <button onclick="toggleTheme()">Modo Oscuro/Claro</button>
     <input type="text" id="search" placeholder="Ingrese etiquetas">
-    <button onclick="fetchImages()">Buscar</button>
-    <div class="gallery" id="gallery"></div><script>
-    async function fetchImages() {
+    <select id="filter">
+        <option value="">Todos</option>
+        <option value="gif">GIF</option>
+        <option value="video">Videos</option>
+    </select>
+    <button onclick="fetchImages(1)">Buscar</button>
+    <div class="gallery" id="gallery"></div>
+    <button onclick="prevPage()">Anterior</button>
+    <button onclick="nextPage()">Siguiente</button>
+    <div id="fullscreen" class="fullscreen" style="display: none;">
+        <span class="close" onclick="closeFullscreen()">&times;</span>
+        <img id="fullscreen-img" src="">
+    </div><script>
+    let currentPage = 1;
+    function toggleTheme() {
+        document.body.classList.toggle("light-mode");
+    }
+    async function fetchImages(page) {
         const query = document.getElementById('search').value;
+        const filter = document.getElementById('filter').value;
         if (!query) return alert('Ingrese una etiqueta');
         
-        const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}`;
+        currentPage = page;
+        let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
+        if (filter) url += `+${filter}`;
+        
         try {
             const response = await fetch(url);
             const images = await response.json();
@@ -86,11 +136,28 @@
                 const imgElement = document.createElement('img');
                 imgElement.src = img.file_url;
                 imgElement.alt = "Imagen de Rule34";
+                imgElement.loading = "lazy";
+                imgElement.onclick = () => openFullscreen(img.file_url);
                 gallery.appendChild(imgElement);
             });
         } catch (error) {
             alert('Error al cargar imágenes');
         }
+    }
+    function prevPage() {
+        if (currentPage > 1) {
+            fetchImages(currentPage - 1);
+        }
+    }
+    function nextPage() {
+        fetchImages(currentPage + 1);
+    }
+    function openFullscreen(src) {
+        document.getElementById('fullscreen-img').src = src;
+        document.getElementById('fullscreen').style.display = 'flex';
+    }
+    function closeFullscreen() {
+        document.getElementById('fullscreen').style.display = 'none';
     }
 </script>
 
