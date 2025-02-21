@@ -4,15 +4,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galería Rule34</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        input { margin: 10px; padding: 5px; }
-        button { padding: 5px 10px; }
-        .gallery { display: flex; flex-wrap: wrap; justify-content: center; }
-        .gallery img { max-width: 200px; margin: 10px; border-radius: 10px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        input {
+            margin: 10px;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #6200ea;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+        .gallery img {
+            max-width: 100%;
+            width: 180px;
+            height: auto;
+            margin: 10px;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .gallery img:hover {
+            transform: scale(1.1);
+        }
+        @media (max-width: 600px) {
+            input {
+                width: 90%;
+            }
+            .gallery img {
+                width: 140px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Galería Rule34</h1>
+    <header>Galería Rule34</header>
     <input type="text" id="search" placeholder="Ingrese etiquetas">
     <button onclick="fetchImages()">Buscar</button>
     <div class="gallery" id="gallery"></div><script>
