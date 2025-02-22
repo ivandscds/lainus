@@ -139,7 +139,7 @@
             images.forEach(img => {
                 if (img.file_url.endsWith('.mp4')) {
                     const videoElement = document.createElement('video');
-                    videoElement.src = img.sample_url || img.file_url;
+                    videoElement.src = img.file_url;
                     videoElement.dataset.fullsize = img.file_url;
                     videoElement.controls = true;
                     videoElement.onclick = function () {
@@ -148,7 +148,7 @@
                     gallery.appendChild(videoElement);
                 } else {
                     const imgElement = document.createElement('img');
-                    imgElement.src = img.sample_url || img.file_url;
+                    imgElement.src = img.file_url;
                     imgElement.dataset.fullsize = img.file_url;
                     imgElement.onclick = function () {
                         openFullscreen(this.dataset.fullsize, false);
@@ -177,6 +177,7 @@
             videoElement.style.display = 'block';
             imageElement.style.display = 'none';
             videoElement.src = src;
+            videoElement.load();
             videoElement.play();
         } else {
             imageElement.style.display = 'block';
@@ -187,6 +188,7 @@
     function closeFullscreen() {
         document.getElementById('fullscreen').style.display = 'none';
         document.getElementById('fullscreen-video').pause();
+        document.getElementById('fullscreen-video').src = '';
     }
 </script>
 
