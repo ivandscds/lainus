@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,6 +59,7 @@
             transition: transform 0.3s;
             cursor: pointer;
             object-fit: cover;
+            loading: lazy;
         }
         .gallery img:hover, .gallery video:hover {
             transform: scale(1.1);
@@ -115,67 +115,71 @@
     <div id="fullscreen" class="fullscreen" style="display: none;">
         <span class="close" onclick="closeFullscreen()">&times;</span>
         <video id="fullscreen-video" controls autoplay></video>
-    </div>
+    </div><script>
+    let currentPage = 1;
+    function toggleTheme() {
+        document.body.classList.toggle("light-mode");
+    }
+    async function fetchImages(page) {
+        const query = document.getElementById('search').value;
+        const filter = document.getElementById('filter').value;
+        if (!query) return alert('Ingrese una etiqueta');
+        
+        currentPage = page;
+        let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
+        if (filter) url += `+${filter}`;
+        
+        try {
+            const response = await fetch(url);
+            const images = await response.json();
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            
+            images.forEach(img => {
+                if (img.file_url.endsWith('.mp4')) {
+                    const videoElement = document.createElement('video');
+                    videoElement.src = img.sample_url || img.file_url;
+                    videoElement.dataset.fullsize = img.file_url;
+                    videoElement.controls = true;
+                    videoElement.onclick = function () {
+                        openFullscreen(this.dataset.fullsize);
+                    };
+                    gallery.appendChild(videoElement);
+                } else {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = img.sample_url || img.file_url;
+                    imgElement.dataset.fullsize = img.file_url;
+                    imgElement.onclick = function () {
+                        openFullscreen(this.dataset.fullsize);
+                    };
+                    gallery.appendChild(imgElement);
+                }
+            });
+        } catch (error) {
+            alert('Error al cargar imágenes');
+        }
+    }
+    function prevPage() {
+        if (currentPage > 1) {
+            fetchImages(currentPage - 1);
+        }
+    }
+    function nextPage() {
+        fetchImages(currentPage + 1);
+    }
+    function openFullscreen(src) {
+        const videoElement = document.getElementById('fullscreen-video');
+        document.getElementById('fullscreen').style.display = 'flex';
+        videoElement.src = src;
+        videoElement.play();
+    }
+    function closeFullscreen() {
+        const videoElement = document.getElementById('fullscreen-video');
+        document.getElementById('fullscreen').style.display = 'none';
+        videoElement.pause();
+        videoElement.src = '';
+    }
+</script>
 
-    <script>
-        let currentPage = 1;
-        function toggleTheme() {
-            document.body.classList.toggle("light-mode");
-        }
-        async function fetchImages(page) {
-            const query = document.getElementById('search').value;
-            const filter = document.getElementById('filter').value;
-            if (!query) return alert('Ingrese una etiqueta');
-            
-            currentPage = page;
-            let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
-            if (filter) url += `+${filter}`;
-            
-            try {
-                const response = await fetch(url);
-                const images = await response.json();
-                const gallery = document.getElementById('gallery');
-                gallery.innerHTML = '';
-                
-                images.forEach(img => {
-                    if (img.file_url.endsWith('.mp4')) {
-                        const videoElement = document.createElement('video');
-                        videoElement.src = img.file_url;
-                        videoElement.controls = true;
-                        videoElement.onclick = () => openFullscreen(img.file_url);
-                        gallery.appendChild(videoElement);
-                    } else {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = img.file_url;
-                        imgElement.onclick = () => openFullscreen(img.file_url);
-                        gallery.appendChild(imgElement);
-                    }
-                });
-            } catch (error) {
-                alert('Error al cargar imágenes');
-            }
-        }
-        function prevPage() {
-            if (currentPage > 1) {
-                fetchImages(currentPage - 1);
-            }
-        }
-        function nextPage() {
-            fetchImages(currentPage + 1);
-        }
-        function openFullscreen(src) {
-            const videoElement = document.getElementById('fullscreen-video');
-            document.getElementById('fullscreen').style.display = 'flex';
-            videoElement.src = src;
-            videoElement.play();
-        }
-        function closeFullscreen() {
-            const videoElement = document.getElementById('fullscreen-video');
-            document.getElementById('fullscreen').style.display = 'none';
-            videoElement.pause();
-            videoElement.src = '';
-        }
-    </script>
 </body>
-</html>
-
+            </html>
