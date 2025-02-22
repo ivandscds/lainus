@@ -83,7 +83,7 @@
             justify-content: center;
             align-items: center;
         }
-        .fullscreen video {
+        .fullscreen img, .fullscreen video {
             max-width: 90%;
             max-height: 90%;
             display: block;
@@ -114,7 +114,8 @@
     <button onclick="nextPage()">Siguiente</button>
     <div id="fullscreen" class="fullscreen" style="display: none;">
         <span class="close" onclick="closeFullscreen()">&times;</span>
-        <video id="fullscreen-video" controls autoplay></video>
+        <img id="fullscreen-image" style="display: none;">
+        <video id="fullscreen-video" controls autoplay style="display: none;"></video>
     </div><script>
     let currentPage = 1;
     function toggleTheme() {
@@ -142,7 +143,7 @@
                     videoElement.dataset.fullsize = img.file_url;
                     videoElement.controls = true;
                     videoElement.onclick = function () {
-                        openFullscreen(this.dataset.fullsize);
+                        openFullscreen(this.dataset.fullsize, true);
                     };
                     gallery.appendChild(videoElement);
                 } else {
@@ -150,7 +151,7 @@
                     imgElement.src = img.sample_url || img.file_url;
                     imgElement.dataset.fullsize = img.file_url;
                     imgElement.onclick = function () {
-                        openFullscreen(this.dataset.fullsize);
+                        openFullscreen(this.dataset.fullsize, false);
                     };
                     gallery.appendChild(imgElement);
                 }
@@ -167,19 +168,27 @@
     function nextPage() {
         fetchImages(currentPage + 1);
     }
-    function openFullscreen(src) {
+    function openFullscreen(src, isVideo) {
         const videoElement = document.getElementById('fullscreen-video');
+        const imageElement = document.getElementById('fullscreen-image');
         document.getElementById('fullscreen').style.display = 'flex';
-        videoElement.src = src;
-        videoElement.play();
+        
+        if (isVideo) {
+            videoElement.style.display = 'block';
+            imageElement.style.display = 'none';
+            videoElement.src = src;
+            videoElement.play();
+        } else {
+            imageElement.style.display = 'block';
+            videoElement.style.display = 'none';
+            imageElement.src = src;
+        }
     }
     function closeFullscreen() {
-        const videoElement = document.getElementById('fullscreen-video');
         document.getElementById('fullscreen').style.display = 'none';
-        videoElement.pause();
-        videoElement.src = '';
+        document.getElementById('fullscreen-video').pause();
     }
 </script>
 
 </body>
-            </html>
+</html>
