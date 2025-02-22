@@ -50,7 +50,7 @@
             justify-content: center;
             padding: 20px;
         }
-        .gallery img {
+        .gallery img, .gallery video {
             max-width: 100%;
             width: 180px;
             height: auto;
@@ -60,14 +60,14 @@
             cursor: pointer;
             object-fit: cover;
         }
-        .gallery img:hover {
+        .gallery img:hover, .gallery video:hover {
             transform: scale(1.1);
         }
         @media (max-width: 600px) {
             input {
                 width: 90%;
             }
-            .gallery img {
+            .gallery img, .gallery video {
                 width: 140px;
             }
         }
@@ -82,7 +82,7 @@
             justify-content: center;
             align-items: center;
         }
-        .fullscreen img {
+        .fullscreen img, .fullscreen video {
             max-width: 90%;
             max-height: 90%;
         }
@@ -112,7 +112,8 @@
     <button onclick="nextPage()">Siguiente</button>
     <div id="fullscreen" class="fullscreen" style="display: none;">
         <span class="close" onclick="closeFullscreen()">&times;</span>
-        <img id="fullscreen-img" src="">
+        <img id="fullscreen-img" src="" style="display: none;">
+        <video id="fullscreen-video" controls style="display: none;"></video>
     </div><script>
     let currentPage = 1;
     function toggleTheme() {
@@ -134,12 +135,17 @@
             gallery.innerHTML = '';
             
             images.forEach(img => {
-                const imgElement = document.createElement('img');
-                imgElement.src = img.file_url;
-                imgElement.alt = "Imagen de Rule34";
-                imgElement.loading = "lazy";
-                imgElement.onclick = () => openFullscreen(img.file_url);
-                gallery.appendChild(imgElement);
+                if (img.file_url.endsWith('.mp4')) {
+                    const videoElement = document.createElement('video');
+                    videoElement.src = img.file_url;
+                    videoElement.onclick = () => openFullscreen(img.file_url, true);
+                    gallery.appendChild(videoElement);
+                } else {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = img.file_url;
+                    imgElement.onclick = () => openFullscreen(img.file_url, false);
+                    gallery.appendChild(imgElement);
+                }
             });
         } catch (error) {
             alert('Error al cargar imágenes');
@@ -153,9 +159,19 @@
     function nextPage() {
         fetchImages(currentPage + 1);
     }
-    function openFullscreen(src) {
-        document.getElementById('fullscreen-img').src = src;
+    function openFullscreen(src, isVideo) {
+        const imgElement = document.getElementById('fullscreen-img');
+        const videoElement = document.getElementById('fullscreen-video');
         document.getElementById('fullscreen').style.display = 'flex';
+        if (isVideo) {
+            imgElement.style.display = 'none';
+            videoElement.style.display = 'block';
+            videoElement.src = src;
+        } else {
+            videoElement.style.display = 'none';
+            imgElement.style.display = 'block';
+            imgElement.src = src;
+        }
     }
     function closeFullscreen() {
         document.getElementById('fullscreen').style.display = 'none';
