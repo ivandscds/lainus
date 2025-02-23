@@ -105,7 +105,9 @@
     <select id="filter">
         <option value="">Todos</option>
         <option value="gif">GIF</option>
-        <option value="video">Videos</option>
+        <option value="mp4">Videos</option>
+        <option value="jpg">Imágenes</option>
+        <option value="png">PNG</option>
     </select>
     <button onclick="fetchImages(1)">Buscar</button>
     <p>Algunos tags pueden ser: "tordtom", "freddytabo", "ai", "gustavo_garcía", "red_laeder", "eddsworld", "gacha_life", "fnaf", "springtrap", "simpsons", "cat_boy", "bunny", "kitty", "femboy", "tomboy", "tsundere", "yandere", "ayano" o "anime"</p>
@@ -128,7 +130,6 @@
         
         currentPage = page;
         let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
-        if (filter) url += `+${filter}`;
         
         try {
             const response = await fetch(url);
@@ -137,6 +138,8 @@
             gallery.innerHTML = '';
             
             images.forEach(img => {
+                if (filter && !img.file_url.endsWith(filter)) return;
+                
                 if (img.file_url.endsWith('.mp4')) {
                     const videoElement = document.createElement('video');
                     videoElement.src = img.file_url;
@@ -169,9 +172,9 @@
         fetchImages(currentPage + 1);
     }
     function openFullscreen(src, isVideo) {
+        document.getElementById('fullscreen').style.display = 'flex';
         const videoElement = document.getElementById('fullscreen-video');
         const imageElement = document.getElementById('fullscreen-image');
-        document.getElementById('fullscreen').style.display = 'flex';
         
         if (isVideo) {
             videoElement.style.display = 'block';
