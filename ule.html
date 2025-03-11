@@ -26,18 +26,20 @@
         }
         input, select {
             margin: 10px;
-            padding: 10px;
-            width: 80%;
+            padding: 12px;
+            width: 85%;
             max-width: 400px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             background: #333;
             color: #fff;
+            font-size: 16px;
         }
         button {
-            padding: 10px 15px;
+            padding: 12px 20px;
+            margin: 5px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             background-color: #6200ea;
             color: white;
             font-size: 16px;
@@ -55,7 +57,7 @@
         }
         .gallery img, .gallery video {
             max-width: 100%;
-            width: 180px;
+            width: 200px;
             height: auto;
             margin: 10px;
             border-radius: 10px;
@@ -72,7 +74,7 @@
                 width: 90%;
             }
             .gallery img, .gallery video {
-                width: 140px;
+                width: 150px;
             }
         }
     </style>
@@ -80,7 +82,7 @@
 <body>
     <header>Galería Rule34</header>
     <button onclick="toggleTheme()">Modo Oscuro/Claro</button>
-    <button onclick="searchRandom()">Modo Aleatorio</button>
+    <button onclick="searchRandom()">Aleatorio</button>
     <input type="text" id="search" placeholder="Ingrese etiquetas">
     <select id="filter">
         <option value="">Todos</option>
@@ -111,7 +113,6 @@
         function fetchImages(page) {
             const query = document.getElementById('search').value;
             if (!query) return alert('Ingrese una etiqueta');
-            
             saveSearchHistory(query);
             currentPage = page;
             let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
@@ -119,23 +120,7 @@
             fetch(url)
                 .then(response => response.json())
                 .then(images => {
-                    const gallery = document.getElementById('gallery');
-                    gallery.innerHTML = '';
-                    images.forEach(img => {
-                        const element = img.file_url.endsWith('.mp4') ? document.createElement('video') : document.createElement('img');
-                        element.src = img.file_url;
-                        element.dataset.fullsize = img.file_url;
-                        element.controls = img.file_url.endsWith('.mp4');
-                        
-                        const downloadBtn = document.createElement('button');
-                        downloadBtn.innerText = 'Descargar';
-                        downloadBtn.onclick = () => downloadFile(img.file_url);
-                        
-                        const wrapper = document.createElement('div');
-                        wrapper.appendChild(element);
-                        wrapper.appendChild(downloadBtn);
-                        gallery.appendChild(wrapper);
-                    });
+                    displayImages(images);
                 })
                 .catch(() => alert('Error al cargar imágenes'));
         }
@@ -171,7 +156,35 @@
             });
         }
         function searchRandom() {
-            fetchImages(1);
+            let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=50`;
+            fetch(url)
+                .then(response => response.json())
+                .then(images => {
+                    if (images.length > 0) {
+                        let randomImage = images[Math.floor(Math.random() * images.length)];
+                        displayImages([randomImage]);
+                    }
+                })
+                .catch(() => alert('Error al cargar imagen aleatoria'));
+        }
+        function displayImages(images) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            images.forEach(img => {
+                const element = img.file_url.endsWith('.mp4') ? document.createElement('video') : document.createElement('img');
+                element.src = img.file_url;
+                element.dataset.fullsize = img.file_url;
+                element.controls = img.file_url.endsWith('.mp4');
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.innerText = 'Descargar';
+                downloadBtn.onclick = () => downloadFile(img.file_url);
+                
+                const wrapper = document.createElement('div');
+                wrapper.appendChild(element);
+                wrapper.appendChild(downloadBtn);
+                gallery.appendChild(wrapper);
+            });
         }
         function downloadFile(url) {
             const link = document.createElement('a');
