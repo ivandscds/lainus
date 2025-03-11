@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #1e1e1e;
+            background-color: #121212;
             color: #fff;
             margin: 0;
             padding: 0;
@@ -18,7 +19,7 @@
             color: #000;
         }
         header {
-            background-color: #333;
+            background-color: #222;
             padding: 15px;
             font-size: 24px;
             font-weight: bold;
@@ -30,6 +31,8 @@
             max-width: 400px;
             border: none;
             border-radius: 5px;
+            background: #333;
+            color: #fff;
         }
         button {
             padding: 10px 15px;
@@ -72,35 +75,12 @@
                 width: 140px;
             }
         }
-        .fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .fullscreen img, .fullscreen video {
-            max-width: 90%;
-            max-height: 90%;
-            display: block;
-        }
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 30px;
-            color: white;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
     <header>Galería Rule34</header>
     <button onclick="toggleTheme()">Modo Oscuro/Claro</button>
+    <button onclick="searchRandom()">Modo Aleatorio</button>
     <input type="text" id="search" placeholder="Ingrese etiquetas">
     <select id="filter">
         <option value="">Todos</option>
@@ -110,90 +90,97 @@
         <option value="png">PNG</option>
     </select>
     <button onclick="fetchImages(1)">Buscar</button>
-    <p>Algunos tags pueden ser: "tordtom", "freddytabo", "ai", "gustavo_garcía", "red_laeder", "eddsworld", "gacha_life", "fnaf", "springtrap", "simpsons", "cat_boy", "bunny", "kitty", "femboy", "tomboy", "tsundere", "yandere", "ayano" o "anime"</p>
+    <h3>Historial de búsqueda:</h3>
+    <ul id="search-history"></ul>
     <div class="gallery" id="gallery"></div>
     <button onclick="prevPage()">Anterior</button>
     <button onclick="nextPage()">Siguiente</button>
-    <div id="fullscreen" class="fullscreen" style="display: none;">
-        <span class="close" onclick="closeFullscreen()">&times;</span>
-        <img id="fullscreen-image" style="display: none;">
-        <video id="fullscreen-video" controls autoplay style="display: none;"></video>
-    </div><script>
-    let currentPage = 1;
-    function toggleTheme() {
-        document.body.classList.toggle("light-mode");
-    }
-    async function fetchImages(page) {
-        const query = document.getElementById('search').value;
-        const filter = document.getElementById('filter').value;
-        if (!query) return alert('Ingrese una etiqueta');
-        
-        currentPage = page;
-        let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
-        
-        try {
-            const response = await fetch(url);
-            const images = await response.json();
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-            
-            images.forEach(img => {
-                if (filter && !img.file_url.endsWith(filter)) return;
-                
-                if (img.file_url.endsWith('.mp4')) {
-                    const videoElement = document.createElement('video');
-                    videoElement.src = img.file_url;
-                    videoElement.dataset.fullsize = img.file_url;
-                    videoElement.controls = true;
-                    videoElement.onclick = function () {
-                        openFullscreen(this.dataset.fullsize, true);
-                    };
-                    gallery.appendChild(videoElement);
-                } else {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = img.file_url;
-                    imgElement.dataset.fullsize = img.file_url;
-                    imgElement.onclick = function () {
-                        openFullscreen(this.dataset.fullsize, false);
-                    };
-                    gallery.appendChild(imgElement);
-                }
-            });
-        } catch (error) {
-            alert('Error al cargar imágenes');
-        }
-    }
-    function prevPage() {
-        if (currentPage > 1) {
-            fetchImages(currentPage - 1);
-        }
-    }
-    function nextPage() {
-        fetchImages(currentPage + 1);
-    }
-    function openFullscreen(src, isVideo) {
-        document.getElementById('fullscreen').style.display = 'flex';
-        const videoElement = document.getElementById('fullscreen-video');
-        const imageElement = document.getElementById('fullscreen-image');
-        
-        if (isVideo) {
-            videoElement.style.display = 'block';
-            imageElement.style.display = 'none';
-            videoElement.src = src;
-            videoElement.load();
-            videoElement.play();
-        } else {
-            imageElement.style.display = 'block';
-            videoElement.style.display = 'none';
-            imageElement.src = src;
-        }
-    }
-    function closeFullscreen() {
-        document.getElementById('fullscreen').style.display = 'none';
-        document.getElementById('fullscreen-video').pause();
-        document.getElementById('fullscreen-video').src = '';
-    }
-</script>
 
+    <script>
+        let currentPage = 1;
+        function toggleTheme() {
+            document.body.classList.toggle("light-mode");
+            localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("theme") === "light") {
+                document.body.classList.add("light-mode");
+            }
+            loadSearchHistory();
+        });
+        function fetchImages(page) {
+            const query = document.getElementById('search').value;
+            if (!query) return alert('Ingrese una etiqueta');
+            
+            saveSearchHistory(query);
+            currentPage = page;
+            let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(images => {
+                    const gallery = document.getElementById('gallery');
+                    gallery.innerHTML = '';
+                    images.forEach(img => {
+                        const element = img.file_url.endsWith('.mp4') ? document.createElement('video') : document.createElement('img');
+                        element.src = img.file_url;
+                        element.dataset.fullsize = img.file_url;
+                        element.controls = img.file_url.endsWith('.mp4');
+                        
+                        const downloadBtn = document.createElement('button');
+                        downloadBtn.innerText = 'Descargar';
+                        downloadBtn.onclick = () => downloadFile(img.file_url);
+                        
+                        const wrapper = document.createElement('div');
+                        wrapper.appendChild(element);
+                        wrapper.appendChild(downloadBtn);
+                        gallery.appendChild(wrapper);
+                    });
+                })
+                .catch(() => alert('Error al cargar imágenes'));
+        }
+        function prevPage() {
+            if (currentPage > 1) {
+                fetchImages(currentPage - 1);
+            }
+        }
+        function nextPage() {
+            fetchImages(currentPage + 1);
+        }
+        function saveSearchHistory(query) {
+            let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            if (!history.includes(query)) {
+                history.unshift(query);
+                if (history.length > 5) history.pop();
+                localStorage.setItem('searchHistory', JSON.stringify(history));
+                loadSearchHistory();
+            }
+        }
+        function loadSearchHistory() {
+            const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            const historyList = document.getElementById('search-history');
+            historyList.innerHTML = '';
+            history.forEach(query => {
+                const li = document.createElement('li');
+                li.innerText = query;
+                li.onclick = () => {
+                    document.getElementById('search').value = query;
+                    fetchImages(1);
+                };
+                historyList.appendChild(li);
+            });
+        }
+        function searchRandom() {
+            fetchImages(1);
+        }
+        function downloadFile(url) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = url.split('/').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 </html>
