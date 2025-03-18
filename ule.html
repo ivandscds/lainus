@@ -114,22 +114,25 @@
             loadSearchHistory();
         });
         function fetchImages(page) {
-            const query = document.getElementById('search').value;
+            const query = document.getElementById('search').value.trim();
             if (!query) return alert('Ingrese una etiqueta');
             saveSearchHistory(query);
             currentPage = page;
             let excludeAI = document.getElementById('filter-ai').checked;
             let aiTags = " -ai -artificial_intelligence -neural_network -generated";
-            let searchQuery = excludeAI ? query + aiTags : query;
+            let searchQuery = excludeAI ? `${query} ${aiTags}` : query;
             
             let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(searchQuery)}&pid=${page}`;
             
             fetch(url)
                 .then(response => response.json())
                 .then(images => {
+                    if (!Array.isArray(images)) {
+                        throw new Error('Respuesta inesperada');
+                    }
                     displayImages(images);
                 })
-                .catch(() => alert('Error al cargar imágenes'));
+                .catch(() => alert('Error al cargar imágenes. Asegúrate de que la API está funcionando correctamente.'));
         }
         function prevPage() {
             if (currentPage > 1) {
@@ -164,4 +167,5 @@
         }
     </script>
 </body>
-</html>
+        </html>
+    
