@@ -84,6 +84,9 @@
     <button onclick="toggleTheme()">Modo Oscuro/Claro</button>
     <button onclick="searchRandom()">Aleatorio</button>
     <input type="text" id="search" placeholder="Ingrese etiquetas">
+    <label>
+        <input type="checkbox" id="filter-ai"> Excluir imágenes generadas por IA
+    </label>
     <select id="filter">
         <option value="">Todos</option>
         <option value="gif">GIF</option>
@@ -115,7 +118,11 @@
             if (!query) return alert('Ingrese una etiqueta');
             saveSearchHistory(query);
             currentPage = page;
-            let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(query)}&pid=${page}`;
+            let excludeAI = document.getElementById('filter-ai').checked;
+            let aiTags = " -ai -artificial_intelligence -neural_network -generated";
+            let searchQuery = excludeAI ? query + aiTags : query;
+            
+            let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(searchQuery)}&pid=${page}`;
             
             fetch(url)
                 .then(response => response.json())
@@ -154,45 +161,6 @@
                 };
                 historyList.appendChild(li);
             });
-        }
-        function searchRandom() {
-            let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=50`;
-            fetch(url)
-                .then(response => response.json())
-                .then(images => {
-                    if (images.length > 0) {
-                        let randomImage = images[Math.floor(Math.random() * images.length)];
-                        displayImages([randomImage]);
-                    }
-                })
-                .catch(() => alert('Error al cargar imagen aleatoria'));
-        }
-        function displayImages(images) {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-            images.forEach(img => {
-                const element = img.file_url.endsWith('.mp4') ? document.createElement('video') : document.createElement('img');
-                element.src = img.file_url;
-                element.dataset.fullsize = img.file_url;
-                element.controls = img.file_url.endsWith('.mp4');
-                
-                const downloadBtn = document.createElement('button');
-                downloadBtn.innerText = 'Descargar';
-                downloadBtn.onclick = () => downloadFile(img.file_url);
-                
-                const wrapper = document.createElement('div');
-                wrapper.appendChild(element);
-                wrapper.appendChild(downloadBtn);
-                gallery.appendChild(wrapper);
-            });
-        }
-        function downloadFile(url) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = url.split('/').pop();
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
     </script>
 </body>
